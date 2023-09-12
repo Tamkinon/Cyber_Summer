@@ -1,6 +1,6 @@
 import socket
 import select
-dani = "bani"
+
 MAX_MSG_LENGTH = 1024
 SERVER_PORT = 5555
 SERVER_IP = '0.0.0.0'
