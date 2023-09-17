@@ -42,5 +42,6 @@ while True:
     for message in messages_to_send:
         current_socket, data = message
         if current_socket in wlist:
+            print(data)
             current_socket.send(data.encode())
             messages_to_send.remove(message)
