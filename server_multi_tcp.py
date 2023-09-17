@@ -33,7 +33,7 @@ while True:
             length = current_socket.recv(4).decode()
             data = current_socket.recv(int(length)).decode()
             if data == "":
-                print("Connection closed", )
+                print("Connection closed", current_socket.getpeername())
                 client_sockets.remove(current_socket)
                 current_socket.close()
                 print_client_sockets(client_sockets)
