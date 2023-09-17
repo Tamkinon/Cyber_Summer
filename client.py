@@ -8,7 +8,9 @@ print("Connected to the server.")
 
 while True:
     name = input("Enter Name:   ")
-    my_socket.send(name.encode())
-
+    message = str(len(name)).zfill(LENGTH_FIELD_SIZE) + name
+    my_socket.send(message.encode())
+    if name == "":
+        break
     data = my_socket.recv(1024).decode()
     print(data)

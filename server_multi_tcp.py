@@ -30,7 +30,8 @@ while True:
             client_sockets.append(connection)
             print_client_sockets(client_sockets)
         else:
-            data = current_socket.recv(MAX_MSG_LENGTH).decode()
+            length = current_socket.recv(4).decode()
+            data = current_socket.recv(int(length)).decode()
             if data == "":
                 print("Connection closed", )
                 client_sockets.remove(current_socket)
