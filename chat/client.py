@@ -41,7 +41,6 @@ message_entry.pack(fill=tk.BOTH, expand=True)
 send_button = tk.Button(root, text="Send", command=lambda: send_message(message_entry))
 send_button.pack()
 
-
 def check_for_messages():
     receive_messages(text1)
     root.after(1000, check_for_messages)
