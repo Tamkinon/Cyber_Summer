@@ -30,19 +30,20 @@ while True:
             client_sockets.append(connection)
             print_client_sockets(client_sockets)
         else:
-            length = current_socket.recv(4).decode()
-            data = current_socket.recv(int(length)).decode()
-            if data == "":
+            data = current_socket.recv(MAX_MSG_LENGTH).decode()
+            if data == "Quit":
                 print("Connection closed", current_socket.getpeername())
                 client_sockets.remove(current_socket)
                 current_socket.close()
                 print_client_sockets(client_sockets)
             else:
-                messages_to_send.append((current_socket, data))
+                messages_to_send.append((current_socket, client_sockets, data))
 
     for message in messages_to_send:
-        current_socket, data = message
-        if current_socket in wlist:
-            print(data)
-            current_socket.send(data.encode())
-            messages_to_send.remove(message)
+        for reciever_socket in client_sockets:
+            sender_socket, client_sockets, data = message
+            if sender_socket in wlist:
+                print(data)
+                reciever_socket.send(data.encode())
+        messages_to_send.remove(message)
+
