@@ -32,7 +32,7 @@ while True:
             print_client_sockets(client_sockets)
         else:
             data = current_socket.recv(MAX_MSG_LENGTH).decode()
-            if data == "Quit":
+            if data == "quit":
                 print("Connection closed", current_socket.getpeername())
                 client_sockets.remove(current_socket)
                 current_socket.close()
