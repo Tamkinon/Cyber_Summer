@@ -1,6 +1,7 @@
 import socket
 import tkinter as tk
 import select
+from tkinter import *
 
 LENGTH_FIELD_SIZE = 4
 
@@ -35,10 +36,10 @@ def create_message_box(message, side):
     # wraplength specifies the maximum number of characters that can appear on a single line before the text is automatically wrapped to the next line.
     # justify specifies how the text should be aligned within its container.
     # "left" means the text is left-aligned within the Label widget, so it starts from the left edge and extends to the right as far as necessary.
-    message_frame = tk.Frame(chat_frame, bd=1, relief="solid", padx=5, pady=5)
-    message_frame.grid(sticky=side)
+    message_frame = tk.Frame(chat_frame, bd=1, relief="solid", padx=5, pady=5, bg="aquamarine2")
+    message_frame.grid(sticky=side, pady=4)
 
-    message_label = tk.Label(message_frame, text=message, wraplength=100, justify="left") ###need to make something that will check if its not cutting a word and lowering part of the word a line.
+    message_label = tk.Label(message_frame, text=message, wraplength=200, justify="left", bg="aquamarine2")
     message_label.pack()
 
 
@@ -64,7 +65,7 @@ send_button.pack()
 
 def check_for_messages():
     receive_messages(chat_frame)
-    root.after(1000, check_for_messages)
+    root.after(100, check_for_messages)
 
 
 # Start checking for messages
