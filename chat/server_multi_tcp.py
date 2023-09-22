@@ -21,7 +21,6 @@ client_sockets = []
 messages_to_send = []
 
 
-
 while True:
     rlist, wlist, xlist = select.select([server_socket] + client_sockets, client_sockets, [])
     for current_socket in rlist:
