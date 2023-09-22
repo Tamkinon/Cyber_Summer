@@ -15,6 +15,7 @@ my_msg = []
 def send_message(msg_entry):
     message = msg_entry.get()
     my_socket.send(message.encode())
+    msg_entry.delete(0, tk.END)
 
 
 def receive_messages(text_widget):
@@ -22,7 +23,9 @@ def receive_messages(text_widget):
     for sock in rlist:
         if sock is my_socket:
             msg = my_socket.recv(1024)
+            text_widget.config(state=tk.NORMAL)
             text_widget.insert(tk.END, msg.decode() + "\n")
+            text_widget.config(state=tk.DISABLED)
 
 
 # Create the main GUI window
@@ -30,7 +33,7 @@ root = tk.Tk()
 root.title("Chat")
 
 # Text box for displaying messages
-text1 = tk.Text(root, relief="sunken", borderwidth=5, width=60, height=25)
+text1 = tk.Text(root, relief="sunken", borderwidth=5, width=60, height=25, state=tk.DISABLED)
 text1.pack()
 
 # Create a text entry widget for user input
@@ -40,6 +43,7 @@ message_entry.pack(fill=tk.BOTH, expand=True)
 # Create a send button
 send_button = tk.Button(root, text="Send", command=lambda: send_message(message_entry))
 send_button.pack()
+
 
 def check_for_messages():
     receive_messages(text1)
