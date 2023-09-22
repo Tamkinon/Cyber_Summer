@@ -1,7 +1,8 @@
 import socket
 import tkinter as tk
 import select
-from tkinter import *
+from tkinter import font
+from tkextrafont import Font
 
 my_socket = socket.socket()
 my_socket.connect(("127.0.0.1", 5555))
@@ -37,7 +38,7 @@ def create_message_box(message, side):
     message_frame = tk.Frame(chat_frame, bd=1, relief="solid", padx=5, pady=5, bg="aquamarine2")
     message_frame.grid(sticky=side, pady=4)
 
-    message_label = tk.Label(message_frame, text=message, wraplength=200, justify="left", bg="aquamarine2")
+    message_label = tk.Label(message_frame, text=message, wraplength=450, justify="left", bg="aquamarine2", font=fnt)
     message_label.pack()
 
 
@@ -45,7 +46,10 @@ def create_message_box(message, side):
 root = tk.Tk()
 root.title("Chat")
 root.configure(bg="lightblue")
-root.geometry("375x500")
+root.geometry("600x800")
+
+# Font for all text
+fnt = Font(file="VarelaRound-Regular.ttf", family="Varela round", size=20)
 
 # Frame for displaying messages
 chat_frame = tk.Frame(root)
@@ -53,11 +57,12 @@ chat_frame.pack(fill=tk.BOTH, expand=True)
 chat_frame.configure(bg="mintcream")
 
 # Create a text entry widget for user input
-message_entry = tk.Entry(root, width=30)
+message_entry = tk.Entry(root, width=30, font=fnt)
 message_entry.pack(fill=tk.BOTH, expand=False)
 
 # Create a send button
-send_button = tk.Button(root, text="Send", command=lambda: send_message(message_entry))
+imgSend = tk.PhotoImage(file='send.png')
+send_button = tk.Button(root, text="Send", image=imgSend, command=lambda: send_message(message_entry))
 send_button.pack()
 
 
