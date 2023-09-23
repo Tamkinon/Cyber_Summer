@@ -1,6 +1,6 @@
 import socket
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, scrolledtext
 import select
 from tkextrafont import Font
 
@@ -13,9 +13,9 @@ my_msg = []
 
 
 def send_message(msg_entry):
-    message = msg_entry.get()
+    message = msg_entry.get("1.0","end-1c")
     my_socket.send(message.encode())
-    msg_entry.delete(0, tk.END)
+    msg_entry.delete(1.0, tk.END)
     if message.lower() == "quit":
         root.destroy()
 
@@ -71,14 +71,18 @@ canvas.configure(yscrollcommand=scrollbar.set)
 canvas.pack(side="left", fill="both", expand=True)
 scrollbar.pack(side="right", fill="y")
 
+# create a frame for user input and send button
+input_frame = tk.Frame(root)
+input_frame.pack(fill=tk.X, side=tk.TOP, anchor='s')
+
 # Create a text entry widget for user input
-message_entry = tk.Entry(root, width=30, font=fnt)
-message_entry.pack(fill=tk.BOTH, expand=False)
+message_entry = scrolledtext.ScrolledText(input_frame, height=2, width=5, font=fnt, wrap=tk.WORD)
+message_entry.pack(side='left', fill='x', expand=True)
 
 # Create a send button.
 imgSend = tk.PhotoImage(file='send.png')
-send_button = tk.Button(root, text="Send", image=imgSend, command=lambda: send_message(message_entry))
-send_button.pack()
+send_button = tk.Button(input_frame, text="Send", image=imgSend, command=lambda: send_message(message_entry))
+send_button.pack(side='right')
 
 
 def check_for_messages():
