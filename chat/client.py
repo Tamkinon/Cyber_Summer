@@ -75,7 +75,7 @@ scrollbar.pack(side="right", fill="y")
 message_entry = tk.Entry(root, width=30, font=fnt)
 message_entry.pack(fill=tk.BOTH, expand=False)
 
-# Create a send button
+# Create a send button.
 imgSend = tk.PhotoImage(file='send.png')
 send_button = tk.Button(root, text="Send", image=imgSend, command=lambda: send_message(message_entry))
 send_button.pack()
