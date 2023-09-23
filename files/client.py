@@ -52,7 +52,8 @@ def main():
     window.title("File explorer")
     window.geometry("550x150+685+480")
     window.resizable(width=tk.FALSE, height=tk.FALSE)
-    frame = tk.Frame(window)
+    window.configure(bg="mintcream")
+    frame = tk.Frame(window, bg="mintcream")
     frame.pack()
 
     # variables
@@ -68,7 +69,7 @@ def main():
     fnt = Font(file="VarelaRound-Regular.ttf", family="Varela round", size=10)
 
     # Labels
-    label = tk.Label(window, text="No USB was found", font=fnt)
+    label = tk.Label(window, text="No USB was found", font=fnt, bg="mintcream")
 
     # Packing Labels
     label.pack(side=tk.BOTTOM)
