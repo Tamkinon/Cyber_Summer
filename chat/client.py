@@ -1,7 +1,7 @@
 import socket
 import tkinter as tk
+from tkinter import ttk
 import select
-from tkinter import font
 from tkextrafont import Font
 
 my_socket = socket.socket()
@@ -15,7 +15,7 @@ my_msg = []
 def send_message(msg_entry):
     message = msg_entry.get()
     my_socket.send(message.encode())
-    msg_entry.delete(0, tk.END)  # added this to delete the text (obviously)
+    msg_entry.delete(0, tk.END)
     if message.lower() == "quit":
         root.destroy()
 
@@ -53,10 +53,23 @@ root.geometry("600x800")
 # Font for all text
 fnt = Font(file="VarelaRound-Regular.ttf", family="Varela round", size=20)
 
+# Create a Canvas
+container = tk.Frame(root, background="#e1fcf7")
+container.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+canvas = tk.Canvas(container, background="#e1fcf7")
+
+# Create a scroll bar
+scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+
 # Frame for displaying messages
-chat_frame = tk.Frame(root)
-chat_frame.pack(fill=tk.BOTH, expand=True)
-chat_frame.configure(bg="mintcream")
+chat_frame = tk.Frame(canvas, background="#e1fcf7")
+chat_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+# Configure the canvas
+canvas.create_window((0, 0), window=chat_frame, anchor="nw")
+canvas.configure(yscrollcommand=scrollbar.set)
+canvas.pack(side="left", fill="both", expand=True)
+scrollbar.pack(side="right", fill="y")
 
 # Create a text entry widget for user input
 message_entry = tk.Entry(root, width=30, font=fnt)
