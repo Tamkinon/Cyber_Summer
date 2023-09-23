@@ -16,6 +16,8 @@ def send_message(msg_entry):
     message = msg_entry.get()
     my_socket.send(message.encode())
     msg_entry.delete(0, tk.END)  # added this to delete the text (obviously)
+    if message.lower() == "quit":
+        root.destroy()
 
 
 def receive_messages(text_widget):
