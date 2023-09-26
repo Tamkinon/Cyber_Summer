@@ -89,7 +89,7 @@ def main():
     download_usb_button.grid(row=1, column=1, padx=pad_x, pady=pad_y)
 
     tk.mainloop()
-1
+
 
 if __name__ == '__main__':
     main()
