@@ -59,6 +59,7 @@ def on_canvas_configure(event):
 
 # Create the main GUI window
 root = tk.Tk()
+root.resizable(width=False, height=False)
 root.title("Chat")
 root.configure(bg="lightblue")
 root.geometry("600x800")
