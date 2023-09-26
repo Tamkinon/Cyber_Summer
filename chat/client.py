@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 import select
 from tkextrafont import Font
+import textwrap
 
 my_socket = socket.socket()
 my_socket.connect(("127.0.0.1", 5555))
@@ -13,8 +14,9 @@ my_msg = []
 
 
 def send_message(msg_entry):
-    message = msg_entry.get("1.0","end-1c")
+    message = msg_entry.get("1.0", "end-1c")
     my_socket.send(message.encode())
+    create_message_box(message, "left", "aquamarine2")
     msg_entry.delete(1.0, tk.END)
     if message.lower() == "quit":
         root.destroy()
@@ -25,10 +27,10 @@ def receive_messages(text_widget):
     for sock in rlist:
         if sock is my_socket:
             msg = my_socket.recv(1024).decode()
-            create_message_box(msg, "w")  # Create a message box per message (e for east, w for west)
+            create_message_box(msg, "right", "gray82")  # Create a message box per message (e for east, w for west)
 
 
-def create_message_box(message, side):
+def create_message_box(message, side, colour):
     # bd (border width) - specifies the width of the border around the frame
     # relief - specifies the type of border or relief effect around the frame.
     # In this case, "solid" is used to create a solid border around the frame.
@@ -37,10 +39,16 @@ def create_message_box(message, side):
     # wraplength specifies the maximum number of characters that can appear on a single line before the text is automatically wrapped to the next line.
     # justify specifies how the text should be aligned within its container.
     # "left" means the text is left-aligned within the Label widget, so it starts from the left edge and extends to the right as far as necessary.
-    message_frame = tk.Frame(chat_frame, bd=1, relief="solid", padx=5, pady=5, bg="aquamarine2")
-    message_frame.grid(sticky=side, pady=4)
+    wrapper = textwrap.TextWrapper(width=37) # 70% = 44, 60% = 37
+    message = wrapper.fill(text=message)
 
-    message_label = tk.Label(message_frame, text=message, wraplength=450, justify="left", bg="aquamarine2", font=fnt)
+    expanding_message_frame = tk.Frame(chat_frame, relief="sunken", pady=5, bg="#e1fcf7")
+    expanding_message_frame.pack(side="top", fill="x")
+
+    message_frame = tk.Frame(expanding_message_frame, bd=1, relief="solid", bg=colour)
+    message_frame.pack(side=side, padx=(4.5, 8))
+
+    message_label = tk.Label(message_frame, text=message, justify="left", bg=colour, font=fnt)
     message_label.pack()
 
 
@@ -56,7 +64,7 @@ root.configure(bg="lightblue")
 root.geometry("600x800")
 
 # Font for all text
-fnt = Font(file="VarelaRound-Regular.ttf", family="Varela round", size=20)
+fnt = Font(file="VarelaRound-Regular.ttf", family="Varela round", size=15)
 
 # Create a Canvas
 container = tk.Frame(root, background="#e1fcf7")
@@ -72,8 +80,9 @@ scrollbar.pack(side="right", fill="y")
 canvas.configure(yscrollcommand=scrollbar.set)
 
 # Frame for displaying messages
-chat_frame = tk.Frame(canvas, background="lime")
+chat_frame = tk.Frame(canvas, background="#e1fcf7")
 canvas.create_window((0, 0), window=chat_frame, anchor="nw", tags="frame")
+chat_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
 # create a frame for user input and send button
 input_frame = tk.Frame(root)
