@@ -44,6 +44,11 @@ def create_message_box(message, side):
     message_label.pack()
 
 
+def on_canvas_configure(event):
+    canvas.itemconfig("frame", width=canvas.winfo_width())  # Make the frame fill the canvas width
+    canvas.config(scrollregion=canvas.bbox("all"))
+
+
 # Create the main GUI window
 root = tk.Tk()
 root.title("Chat")
@@ -57,19 +62,18 @@ fnt = Font(file="VarelaRound-Regular.ttf", family="Varela round", size=20)
 container = tk.Frame(root, background="#e1fcf7")
 container.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 canvas = tk.Canvas(container, background="#e1fcf7")
+canvas.pack(side="left", fill="both", expand=True)
 
 # Create a scroll bar
 scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+scrollbar.pack(side="right", fill="y")
+
+# Configure the canvas to work with the scrollbar
+canvas.configure(yscrollcommand=scrollbar.set)
 
 # Frame for displaying messages
-chat_frame = tk.Frame(canvas, background="#e1fcf7")
-chat_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-
-# Configure the canvas
-canvas.create_window((0, 0), window=chat_frame, anchor="nw")
-canvas.configure(yscrollcommand=scrollbar.set)
-canvas.pack(side="left", fill="both", expand=True)
-scrollbar.pack(side="right", fill="y")
+chat_frame = tk.Frame(canvas, background="lime")
+canvas.create_window((0, 0), window=chat_frame, anchor="nw", tags="frame")
 
 # create a frame for user input and send button
 input_frame = tk.Frame(root)
@@ -83,6 +87,10 @@ message_entry.pack(side='left', fill='x', expand=True)
 imgSend = tk.PhotoImage(file='send.png')
 send_button = tk.Button(input_frame, text="Send", image=imgSend, command=lambda: send_message(message_entry))
 send_button.pack(side='right')
+
+# configure the canvas
+canvas.bind("<Configure>", on_canvas_configure)
+on_canvas_configure(None)
 
 
 def check_for_messages():
