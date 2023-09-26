@@ -42,7 +42,7 @@ while True:
     for message in messages_to_send:
         for reciever_socket in client_sockets:
             sender_socket, client_sockets, data = message
-            if sender_socket in wlist:
+            if sender_socket in wlist and reciever_socket is not sender_socket:
                 print(data)
                 reciever_socket.send(data.encode())
         messages_to_send.remove(message)
