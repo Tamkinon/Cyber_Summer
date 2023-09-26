@@ -36,11 +36,9 @@ def create_message_box(message, side, colour):
     # In this case, "solid" is used to create a solid border around the frame.
     # padx and pady -
     # specify the amount of empty space or padding to add around the content inside the frame.
-    # wraplength specifies the maximum number of characters that can appear on a single line before the text is automatically wrapped to the next line.
+    # wraplength specifies the maximum number of pixels that can appear on a single line before the text is automatically wrapped to the next line.
     # justify specifies how the text should be aligned within its container.
     # "left" means the text is left-aligned within the Label widget, so it starts from the left edge and extends to the right as far as necessary.
-    wrapper = textwrap.TextWrapper(width=37) # 70% = 44, 60% = 37
-    message = wrapper.fill(text=message)
 
     expanding_message_frame = tk.Frame(chat_frame, relief="sunken", pady=5, bg="#e1fcf7")
     expanding_message_frame.pack(side="top", fill="x")
@@ -48,7 +46,7 @@ def create_message_box(message, side, colour):
     message_frame = tk.Frame(expanding_message_frame, bd=1, relief="solid", bg=colour)
     message_frame.pack(side=side, padx=(4.5, 8))
 
-    message_label = tk.Label(message_frame, text=message, justify="left", bg=colour, font=fnt)
+    message_label = tk.Label(message_frame, text=message, justify="left", bg=colour, font=fnt, wraplength=450)
     message_label.pack()
 
 
