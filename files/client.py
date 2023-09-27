@@ -8,6 +8,9 @@ import win32file
 
 DL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
+server_path = r'C:\Users\user\Desktop\Server Files'
+desktop_path = r'C:\Users\user\Desktop'
+
 window = tk.Tk()
 
 var1 = tk.StringVar()
@@ -20,11 +23,13 @@ text_list = ["*.txt", "*.doc", "*.docx"]
 
 texts_list = ["Select a file you want to download from the Server",
               "Select a file you want to download from the USB",
-              "Select a file you want to Upload to the Server",
-              "Select a file you want to Upload to the USB",
+              "Select a file you want to upload to the Server",
+              "Select a file you want to upload to the USB",
               "Select where you want the file to be downloaded to",
-              "Select where you want the file to be uploaded to"
-              ]
+              "Select where you want the file to be uploaded to"]
+
+file_types = (("text files", text_list), ("image file", image_list),
+              ("video files", video_list), ("audio files", audio_list))
 
 
 def check_for_usb_type(drives_list):
@@ -41,8 +46,9 @@ def check_drives():
     return usb_check, usb
 
 
-def change_state(check_usb, upload_usb_button, download_usb_button, label):
-    window.after(100, lambda: change_state(check_drives()[0], upload_usb_button, download_usb_button, label))
+def change_state(check_usb, upload_usb_button, download_usb_button, label, save_button):
+    window.after(100, lambda: change_state(check_drives()[0], upload_usb_button,
+                                           download_usb_button, label, save_button))
     if check_usb:
         upload_usb_button.configure(state=tk.ACTIVE)
         download_usb_button.configure(state=tk.ACTIVE)
@@ -52,19 +58,29 @@ def change_state(check_usb, upload_usb_button, download_usb_button, label):
         download_usb_button.configure(state=tk.DISABLED)
         label.config(text="No USB was found")
 
+    if var1.get() != "" and var2.get() != "":
+        save_button.configure(state=tk.ACTIVE)
+    else:
+        save_button.configure(state=tk.DISABLED)
 
-def open_dialog(initial_dir, index1, index2):
-    window.filename = filedialog.askopenfilename(initialdir=r'{}'.format(initial_dir),
-                                                 title=texts_list[index1],
-                                                 filetypes=(("audio files", audio_list), ("image file", image_list),
-                                                            ("video files", video_list), ("text files", text_list)))
+
+def open_dialog(from_path, to_path, index1, index2):
+    window.filename = filedialog.askopenfilename(initialdir=r'{}'.format(from_path), title=texts_list[index1],
+                                                 filetypes=file_types)
     var1.set(window.filename)
+    if var1.get() != "":
 
-    window.filename = filedialog.askopenfilename(initialdir=r'{}'.format(initial_dir),
-                                                 title=texts_list[index2],
-                                                 filetypes=(("audio files", audio_list), ("image file", image_list),
-                                                            ("video files", video_list), ("text files", text_list)))
-    var2.set(window.filename)
+        window.filename = filedialog.askdirectory(initialdir=r'{}'.format(to_path), title=texts_list[index2])
+
+        var2.set(window.filename)
+        if var2.get() == "":
+            var1.set("")
+
+
+def save_file(file_name):
+    with open(var1.get(), 'rb') as file1,\
+            open(var2.get() + "\\" + file_name, 'wb') as file2:
+        file2.write(file1.read())
 
 
 def main():
@@ -74,7 +90,7 @@ def main():
     """
     # Initiate window
     window.title("File explorer")
-    window.geometry("600x280+685+480")
+    window.geometry("600x290+685+480")
     window.resizable(width=tk.FALSE, height=tk.FALSE)
     window.configure(bg="#f5f9fa")
 
@@ -112,27 +128,32 @@ def main():
     # Buttons
     download_button = tk.Button(frame, height=2, width=30, text="Download a file from the Server",
                                 font=fnt, fg="black", bg="#e3e7e8", relief="solid", border=1,
-                                command=lambda: open_dialog(usb, 0, 4))
+                                command=lambda: open_dialog(server_path, desktop_path, 0, 4))
 
     upload_button = tk.Button(frame, height=2, width=30, text="Upload a file to the Server",
                               font=fnt, fg="black", bg="#e3e7e8", relief="solid", border=1,
-                              command=lambda: open_dialog(usb, 2, 5))
+                              command=lambda: open_dialog(desktop_path, server_path, 2, 5))
 
     download_usb_button = tk.Button(frame, height=2, width=30, text="Download a file from the USB", font=fnt,
                                     fg="black", bg="#e3e7e8", relief="solid", border=1,
-                                    command=lambda: open_dialog(usb, 1, 4))
+                                    command=lambda: open_dialog(usb, desktop_path, 1, 4))
 
     upload_usb_button = tk.Button(frame, height=2, width=30, text="Upload a file to the USB", font=fnt, fg="black",
                                   bg="#e3e7e8", relief="solid", border=1,
-                                  command=lambda: open_dialog(usb, 3, 5))
+                                  command=lambda: open_dialog(desktop_path, usb, 3, 5))
 
-    change_state(check_usb, upload_usb_button, download_usb_button, usb_label)
+    save_button = tk.Button(window, height=1, width=10, text="Save", font=fnt, fg="black",
+                            bg="#e3e7e8", relief="solid", border=1, command=lambda: save_file(var1.get().split("/")[-1]))
+
+    change_state(check_usb, upload_usb_button, download_usb_button, usb_label, save_button)
 
     # Grid
     upload_button.grid(row=0, column=1, padx=pad_x, pady=pad_y)
     download_button.grid(row=0, column=0, padx=pad_x, pady=pad_y)
     upload_usb_button.grid(row=1, column=1, padx=pad_x, pady=pad_y)
     download_usb_button.grid(row=1, column=0, padx=pad_x, pady=pad_y)
+
+    save_button.pack(side=tk.RIGHT, anchor="s", padx=pad_x + 1, pady=3)
 
     tk.mainloop()
 
