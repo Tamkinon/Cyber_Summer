@@ -123,17 +123,15 @@ def main():
 
     :return:
     """
-    # Initiate window
+    # Initiate window and frame
     window.title("File Manager")
     window.geometry("600x290+685+480")
     window.resizable(width=tk.FALSE, height=tk.FALSE)
     window.configure(bg=bg)
-
-    frame = tk.Frame(window, bg=bg)
-    frame.pack()
-
     window.rowconfigure(ROWS)
     window.columnconfigure(COLUMNS)
+    frame = tk.Frame(window, bg=bg)
+    frame.pack()
 
     # Labels
     usb_label = tk.Label(window, text="No USB was found", font=fnt, bg=bg)
@@ -162,9 +160,8 @@ def main():
     upload_usb_button = tk.Button(frame, button_settings, text=button_texts[3],
                                   command=lambda: open_dialog(desktop_path, check_for_usb_type()[1], 3, 5))
 
-    save_button = tk.Button(window, height=1, width=10, text="Save", font=fnt, fg="black",
-                            bg="#e3e7e8", relief="solid", border=1,
-                            command=lambda: save_file(var1.get().split("/")[-1]))
+    save_button = tk.Button(window, height=1, width=10, text="Save", font=fnt, fg="black", bg=button_bg,
+                            relief="solid", border=1, command=lambda: save_file(var1.get().split("/")[-1]))
 
     change_state(check_for_usb_type()[0], upload_usb_button, download_usb_button, usb_label, save_button)
 
