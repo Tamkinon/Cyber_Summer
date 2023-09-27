@@ -3,7 +3,8 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 import select
 from tkextrafont import Font
-import textwrap
+import random
+import datetime
 
 my_socket = socket.socket()
 my_socket.connect(("127.0.0.1", 5555))
@@ -14,23 +15,31 @@ my_msg = []
 
 
 def send_message(msg_entry):
-    message = msg_entry.get("1.0", "end-1c")
+    original_message = msg_entry.get("1.0", "end-1c")
+    message = str(len(name)).zfill(2) + name + "1" + str(len(original_message)).zfill(4) + original_message
     my_socket.send(message.encode())
-    create_message_box(message, "left", "aquamarine2")
     msg_entry.delete(1.0, tk.END)
-    if message.lower() == "quit":
+    if original_message.lower() == "quit":
         root.destroy()
+    else:
+        create_message_box(original_message, "left", "aquamarine2", name)
 
 
 def receive_messages(text_widget):
     rlist, wlist, xlist = select.select(socket_messages, socket_messages, [])
     for sock in rlist:
         if sock is my_socket:
-            msg = my_socket.recv(1024).decode()
-            create_message_box(msg, "right", "gray82")  # Create a message box per message (e for east, w for west)
+            name_length = my_socket.recv(2).decode()
+            client_name = my_socket.recv(int(name_length)).decode()
+            message_length = my_socket.recv(4).decode()
+            data = my_socket.recv(int(message_length)).decode()
+            if client_name == "Server":
+                create_message_box(data, "top", "gray82", client_name)
+            else:
+                create_message_box(data, "right", "LightCyan3", client_name)
 
 
-def create_message_box(message, side, colour):
+def create_message_box(message, side, colour, name):
     # bd (border width) - specifies the width of the border around the frame
     # relief - specifies the type of border or relief effect around the frame.
     # In this case, "solid" is used to create a solid border around the frame.
@@ -46,13 +55,35 @@ def create_message_box(message, side, colour):
     message_frame = tk.Frame(expanding_message_frame, bd=1, relief="solid", bg=colour)
     message_frame.pack(side=side, padx=(4.5, 8))
 
+    name_label = tk.Label(message_frame, text=name, font=("Arial", 14), justify="left", bg=colour, fg=random_colour(name))
+    name_label.pack(anchor="w")
+
     message_label = tk.Label(message_frame, text=message, justify="left", bg=colour, font=fnt, wraplength=450)
-    message_label.pack()
+    message_label.pack(anchor="w")
+
+    time_label = tk.Label(message_frame, text=update_time(), font=("Arial", 12), justify="left", bg=colour)
+    time_label.pack(anchor="e")
 
 
 def on_canvas_configure(event):
     canvas.itemconfig("frame", width=canvas.winfo_width())  # Make the frame fill the canvas width
     canvas.config(scrollregion=canvas.bbox("all"))
+
+
+def random_colour(name):
+    random.seed(name)
+    color = random.randrange(0, 2 ** 16)
+    hex_color = hex(color)
+    colour_string = "#" + hex_color[2:4] + "00" + hex_color[-2:]
+    return colour_string
+
+
+def update_time():
+    return datetime.datetime.now().strftime("%H:%M")
+
+
+name = input("What is your name? ")
+name_colour = random_colour(name)
 
 
 # Create the main GUI window

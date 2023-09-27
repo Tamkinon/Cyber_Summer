@@ -30,20 +30,29 @@ while True:
             client_sockets.append(connection)
             print_client_sockets(client_sockets)
         else:
-            data = current_socket.recv(MAX_MSG_LENGTH).decode()
+            name_length = current_socket.recv(2).decode()
+            client_name = current_socket.recv(int(name_length)).decode()
+            client_command = current_socket.recv(1).decode()
+            message_length = current_socket.recv(4).decode()
+            data = current_socket.recv(int(message_length)).decode()
             if data == "quit":
                 print("Connection closed", current_socket.getpeername())
+                data = client_name + " has left the chat!"
+                message = "6".zfill(2) + "Server" + str(len(data)).zfill(4) + data
+                messages_to_send.append((current_socket, client_sockets, message))
                 client_sockets.remove(current_socket)
+                current_socket.recv(MAX_MSG_LENGTH)
                 current_socket.close()
                 print_client_sockets(client_sockets)
             else:
-                messages_to_send.append((current_socket, client_sockets, data))
+                message = name_length.zfill(2) + client_name + message_length.zfill(4) + data
+                messages_to_send.append((current_socket, client_sockets, message))
 
     for message in messages_to_send:
-        for reciever_socket in client_sockets:
+        for receiver_socket in client_sockets:
             sender_socket, client_sockets, data = message
-            if sender_socket in wlist and reciever_socket is not sender_socket:
+            if sender_socket in wlist and receiver_socket is not sender_socket:
                 print(data)
-                reciever_socket.send(data.encode())
+                receiver_socket.send(data.encode())
         messages_to_send.remove(message)
 
