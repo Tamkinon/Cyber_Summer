@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 import select
 from tkextrafont import Font
-import textwrap
 import random
 import datetime
 
