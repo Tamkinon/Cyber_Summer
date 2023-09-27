@@ -119,7 +119,7 @@ def main():
                               command=lambda: open_dialog(usb, 2, 5))
 
     download_usb_button = tk.Button(frame, height=2, width=30, text="Download a file from the USB", font=fnt,
-                                    fg="black",bg="#e3e7e8", relief="solid", border=1,
+                                    fg="black", bg="#e3e7e8", relief="solid", border=1,
                                     command=lambda: open_dialog(usb, 1, 4))
 
     upload_usb_button = tk.Button(frame, height=2, width=30, text="Upload a file to the USB", font=fnt, fg="black",
