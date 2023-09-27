@@ -33,7 +33,10 @@ def receive_messages(text_widget):
             client_name = my_socket.recv(int(name_length)).decode()
             message_length = my_socket.recv(4).decode()
             data = my_socket.recv(int(message_length)).decode()
-            create_message_box(data, "right", "gray82", client_name)
+            if client_name == "Server":
+                create_message_box(data, "top", "gray82", client_name)
+            else:
+                create_message_box(data, "right", "LightCyan3", client_name)
 
 
 def create_message_box(message, side, colour, name):
