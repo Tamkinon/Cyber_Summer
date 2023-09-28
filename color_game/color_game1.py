@@ -122,8 +122,10 @@ def return_to_menu(root):
     root.destroy()
     main()
 
+
 def print_picture(picture_matrix, root1):
     global square_length
+    square_length = root1.winfo_screenheight()*0.5 / len(picture_matrix)
     x = 0
     y = 0
 
@@ -179,7 +181,7 @@ def create_buttons(root1, buttons):
     remove_all_color_button.place(relx=0.2, rely=0.3, width=color_square_length*3, height=color_square_length,
                                   anchor=CENTER)
     submit_button.place(relx=0.8, rely=0.5, width=color_square_length*5, height=color_square_length*2, anchor=CENTER)
-    menu_button.place(relx=0.2, rely=0.8, width=color_square_length*3, height=color_square_length*1, anchor=CENTER)
+    menu_button.place(relx=0.1, rely=0.8, width=color_square_length*3, height=color_square_length*1, anchor=CENTER)
 
 
 def picture1(menu):
