@@ -9,18 +9,12 @@ class ColorButton:
     def __init__(self, root, color_type):
         self.__root = root
         self.__color_type = color_list1[color_type]
-        self.__button = Button(self.__root, text=str(color_type), command=lambda: self.color())
-    # def __init__(self, x, y, root, color_type):
-    #     self.__x = x
-    #     self.__y = y
-    #     self.__root = root
-    #     self.__color_type = color_list1[color_type]
-    #     self.__button = Button(self.__root, text=str(color_type), command=lambda: self.color())
-    #     self.__button.place(x=self.__x, y=self.__y, width=square_length, height=square_length)
+        self.__text = str(color_type)
+        self.__button = Button(self.__root, text=self.__text, command=lambda: self.color())
 
     def color(self):
-        if ColorButton.__current_color == self.__color_type:  # fix
-            self.__button.configure(bg=ColorButton.__current_color)
+        if ColorButton.__current_color == self.__color_type:
+            self.__button.configure(bg=ColorButton.__current_color, text="")
 
     @staticmethod
     def set_current_color(new_color):
@@ -28,6 +22,9 @@ class ColorButton:
 
     def get_color_type(self):
         return self.__color_type
+
+    def get_text(self):
+        return self.__text
 
     def get_button(self):
         return self.__button
@@ -101,12 +98,12 @@ def change_color(c, color_indicator):
 
 def color_all(buttons):
     for obj in buttons:
-        obj.get_button().configure(bg=obj.get_color_type())
+        obj.get_button().configure(bg=obj.get_color_type(), text="")
 
 
 def remove_all_color(buttons):
     for obj in buttons:
-        obj.get_button().configure(bg="SystemButtonFace")
+        obj.get_button().configure(bg="SystemButtonFace", text=obj.get_text())
 
 
 def submit(buttons, root):
@@ -120,6 +117,10 @@ def submit(buttons, root):
     else:
         messagebox.showinfo("oops", "the picture isn't completely colored!", parent=root)
 
+
+def return_to_menu(root):
+    root.destroy()
+    main()
 
 def print_picture(picture_matrix, root1):
     global square_length
@@ -140,25 +141,6 @@ def print_picture(picture_matrix, root1):
         y += square_length
         x = 0
     return all_buttons
-# def print_picture(picture_matrix, root1):
-#     global square_length
-#     w = root1.winfo_screenwidth()
-#     h = root1.winfo_screenheight()
-#     x = (w-len(picture_matrix[0])*square_length)/2
-#     y = (h-len(picture_matrix)*square_length)/2
-#
-#     frame = Frame(root1)
-#
-#     all_buttons = []
-#
-#     for i in range(len(picture_matrix)):
-#         for j in range(len(picture_matrix[i])):
-#             all_buttons.append(ColorButton(x, y, root1, picture_matrix[i][j]))
-#             x += square_length
-#         y += square_length
-#         x = (w-len(picture_matrix[0])*square_length)/2
-#
-#     return all_buttons
 
 
 def create_buttons(root1, buttons):
@@ -185,6 +167,7 @@ def create_buttons(root1, buttons):
     remove_all_color_button = Button(root1, command=lambda: remove_all_color(buttons), text="remove all color",
                                      font="arial 15", bg='white')
     submit_button = Button(root1, command=lambda: submit(buttons, root1), text="submit", bg='white', font="arial 40")
+    menu_button = Button(root1, command=lambda: return_to_menu(root1), text="menu", bg="light blue", font="arial 40")
 
     x = 0.5/len(color_list)
     for i in color_list:
@@ -196,9 +179,11 @@ def create_buttons(root1, buttons):
     remove_all_color_button.place(relx=0.2, rely=0.3, width=color_square_length*3, height=color_square_length,
                                   anchor=CENTER)
     submit_button.place(relx=0.8, rely=0.5, width=color_square_length*5, height=color_square_length*2, anchor=CENTER)
+    menu_button.place(relx=0.2, rely=0.8, width=color_square_length*3, height=color_square_length*1, anchor=CENTER)
 
 
-def picture1():
+def picture1(menu):
+    menu.destroy()
     root = create_root("picture 1")
 
     buttons = print_picture(picture_matrix1, root)
@@ -208,7 +193,8 @@ def picture1():
     root.mainloop()
 
 
-def picture2():
+def picture2(menu):
+    menu.destroy()
     root = create_root("picture 2")
 
     buttons = print_picture(picture_matrix2, root)
@@ -218,7 +204,8 @@ def picture2():
     root.mainloop()
 
 
-def picture3():
+def picture3(menu):
+    menu.destroy()
     root = create_root("picture 3")
 
     buttons = print_picture(picture_matrix3, root)
@@ -235,9 +222,9 @@ def main():
     menu.geometry("%dx%d+%d+%d" % (int(w / 2), int(h / 2), int(w / 4), int(h / 5)))
     menu.configure(bg="light blue")
 
-    button1 = Button(menu, text="first picture", bg="orange", command=lambda: picture1())
-    button2 = Button(menu, text="second picture", bg="dark orange", command=lambda: picture2())
-    button3 = Button(menu, text="third picture", bg="coral", command=lambda: picture3())
+    button1 = Button(menu, text="first picture", bg="orange", command=lambda: picture1(menu))
+    button2 = Button(menu, text="second picture", bg="dark orange", command=lambda: picture2(menu))
+    button3 = Button(menu, text="third picture", bg="coral", command=lambda: picture3(menu))
     title = Label(menu, text="color game", bg="light blue", font="Times 60 italic bold")
 
     title.pack(expand=True)
