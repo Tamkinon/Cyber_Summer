@@ -19,7 +19,7 @@ button_options_window = None
 
 def send_message(msg_entry):
     original_message = msg_entry.get("1.0", "end-1c")
-    message = str(len(name)).zfill(2) + name + "1" + str(len(original_message)).zfill(4) + original_message
+    message = str(len(name)).zfill(2) + name + "1" + str(len(original_message.encode())).zfill(4) + original_message
     my_socket.send(message.encode())
     msg_entry.delete(1.0, tk.END)
     if original_message.lower() == "quit":
