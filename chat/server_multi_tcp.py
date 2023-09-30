@@ -40,8 +40,8 @@ while True:
                 data = client_name + " has left the chat!"
                 message = "6".zfill(2) + "Server" + str(len(data)).zfill(4) + data
                 messages_to_send.append((current_socket, client_sockets, message))
+                #current_socket.recv(MAX_MSG_LENGTH).decode()
                 client_sockets.remove(current_socket)
-                current_socket.recv(MAX_MSG_LENGTH)
                 current_socket.close()
                 print_client_sockets(client_sockets)
             else:

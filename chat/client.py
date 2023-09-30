@@ -68,6 +68,7 @@ def create_message_box(message, side, colour, name):
 def on_canvas_configure(event):
     canvas.itemconfig("frame", width=canvas.winfo_width())  # Make the frame fill the canvas width
     canvas.config(scrollregion=canvas.bbox("all"))
+    # canvas.yview_moveto(1.0)
 
 
 def random_colour(name):
@@ -82,6 +83,10 @@ def update_time():
     return datetime.datetime.now().strftime("%H:%M")
 
 
+def on_mousewheel(event):
+    canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+
 name = input("What is your name? ")
 name_colour = random_colour(name)
 
@@ -89,7 +94,7 @@ name_colour = random_colour(name)
 # Create the main GUI window
 root = tk.Tk()
 root.resizable(width=False, height=False)
-root.title("Chat")
+root.title(name + "'s Chat")
 root.configure(bg="lightblue")
 root.geometry("600x800")
 
@@ -105,6 +110,8 @@ canvas.pack(side="left", fill="both", expand=True)
 # Create a scroll bar
 scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
 scrollbar.pack(side="right", fill="y")
+canvas.bind_all("<MouseWheel>", on_mousewheel)
+canvas.configure(yscrollcommand=scrollbar.set)
 
 # Configure the canvas to work with the scrollbar
 canvas.configure(yscrollcommand=scrollbar.set)
