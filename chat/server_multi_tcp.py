@@ -52,37 +52,40 @@ while True:
             if client_command == '1':
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
-                message = name_length.zfill(2) + client_name + message_length.zfill(4) + data
-                messages_to_send.append((current_socket, client_sockets, message))
+                if data == "quit":
+                    print("Connection closed", current_socket.getpeername())
+                    data = client_name + " has left the chat!"
+                    message = "6".zfill(2) + "Server" + str(len(data)).zfill(4) + data
+                    messages_to_send.append((current_socket, client_sockets, message))
+                    client_sockets.remove(current_socket)
+                    name_list.remove(client_name)
+                    current_socket.close()
+                    print_client_sockets(client_sockets)
+                else:
+                    message = name_length.zfill(2) + client_name + message_length.zfill(4) + data
+                    messages_to_send.append((current_socket, client_sockets, message))
             if client_command == '3':
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
                 message = client_name + " kicked " + data
                 message = "6".zfill(2) + "Server" + str(len(message)).zfill(4) + message
                 kicked_client_socket = client_sockets[name_list.index(data)]
+                name_list.remove(data)
                 messages_to_send.append((kicked_client_socket, client_sockets, message))
             if client_command == '6':
                 current_socket.send(str(managers_list).encode())
-            if data == "quit":
-                print("Connection closed", current_socket.getpeername())
-                data = client_name + " has left the chat!"
-                message = "6".zfill(2) + "Server" + str(len(data)).zfill(4) + data
-                messages_to_send.append((current_socket, client_sockets, message))
-                client_sockets.remove(current_socket)
-                current_socket.close()
-                print_client_sockets(client_sockets)
-
+            if client_command == '7':
+                current_socket.send(str(name_list).encode())
     for message in messages_to_send:
         for receiver_socket in client_sockets:
             sender_socket, client_sockets, data = message
             if sender_socket == kicked_client_socket and sender_socket in wlist:
                 kicked_client_socket.send(data.encode())
-                if receiver_socket == kicked_client_socket:
-                    client_sockets.remove(kicked_client_socket)
-                    kicked_client_socket.close()
-                    print_client_sockets(client_sockets)
             if sender_socket in wlist and receiver_socket is not sender_socket:
                 print(data)
                 receiver_socket.send(data.encode())
         messages_to_send.remove(message)
-
+    if kicked_client_socket in client_sockets:
+        client_sockets.remove(kicked_client_socket)
+        kicked_client_socket.close()
+        print_client_sockets(client_sockets)

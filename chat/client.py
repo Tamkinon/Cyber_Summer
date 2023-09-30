@@ -94,7 +94,10 @@ def check_if_have_access(button, user_name):
     my_socket.send((str(len(name)).zfill(2) + name + "6").encode())
     s_response = my_socket.recv(1024).decode()
     manager_list = eval(s_response)
-    if name not in manager_list or name == user_name:
+    my_socket.send((str(len(name)).zfill(2) + name + "7").encode())
+    s_response = my_socket.recv(1024).decode()
+    name_list = eval(s_response)
+    if name not in manager_list or name == user_name or user_name not in name_list:
         button.configure(state=tk.DISABLED)
     else:
         button.configure(state=tk.ACTIVE)
@@ -115,10 +118,16 @@ def kick_button(user_name, window):
     window.destroy()
 
 
+def destroy_popup(event):
+    global button_options_window
+    button_options_window = None
+
+
 def name_button_options_window(user_name):
     global button_options_window
     if not button_options_window:
         button_options_window = tk.Toplevel()
+        button_options_window.bind("<Destroy>", destroy_popup)
         button_options_window.title("Options Window")
         button_options_window.resizable(width=False, height=False)
         button_options_window.configure(bg="mintcream")
