@@ -27,6 +27,19 @@ def promote_to_manager(username):
         messages_to_send.append((current_socket, client_sockets, msg))
 
 
+def mute(username):
+    if username not in muted_list:
+        muted_list.append(username)
+        server_message = data + " has been muted by " + client_name
+        msg = "6".zfill(2) + "Server" + str(len(server_message)).zfill(4) + server_message
+        messages_to_send.append((current_socket, client_sockets, msg))
+    else:
+        muted_list.remove(username)
+        server_message = data + " has been unmuted by " + client_name
+        msg = "6".zfill(2) + "Server" + str(len(server_message)).zfill(4) + server_message
+        messages_to_send.append((current_socket, client_sockets, msg))
+
+
 print("Setting up server...")
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((SERVER_IP, SERVER_PORT))
@@ -38,6 +51,7 @@ messages_to_send = []
 # managers stuff
 managers_list = ['Ori', 'Tamir']
 name_list = []
+muted_list = []
 
 
 while True:
@@ -70,8 +84,9 @@ while True:
                     current_socket.close()
                     print_client_sockets(client_sockets)
                 else:
-                    message = name_length.zfill(2) + client_name + message_length.zfill(4) + data
-                    messages_to_send.append((current_socket, client_sockets, message))
+                    if client_name not in muted_list:
+                        message = name_length.zfill(2) + client_name + message_length.zfill(4) + data
+                        messages_to_send.append((current_socket, client_sockets, message))
             if client_command == '2':
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
@@ -84,10 +99,16 @@ while True:
                 kicked_client_socket = client_sockets[name_list.index(data)]
                 name_list.remove(data)
                 messages_to_send.append((kicked_client_socket, client_sockets, message))
-            if client_command == '6': # sending the managers list
+            if client_command == '4':
+                message_length = current_socket.recv(4).decode()
+                data = current_socket.recv(int(message_length)).decode()
+                mute(data)
+            if client_command == '6':  # sending the managers list
                 current_socket.send(str(managers_list).encode())
-            if client_command == '7': # sending all-users list
+            if client_command == '7':  # sending all-users list
                 current_socket.send(str(name_list).encode())
+            if client_command == '8':  # sending the muted users list
+                current_socket.send(str(muted_list).encode())
     for message in messages_to_send:
         for receiver_socket in client_sockets:
             sender_socket, client_sockets, data = message
@@ -98,7 +119,6 @@ while True:
                 receiver_socket.send(data.encode())
         messages_to_send.remove(message)
     if kicked_client_socket in client_sockets:
-        print("danny dori")
         client_sockets.remove(kicked_client_socket)
         kicked_client_socket.close()
         print_client_sockets(client_sockets)

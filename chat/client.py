@@ -25,7 +25,10 @@ def send_message(msg_entry):
     if original_message.lower() == "quit":
         root.destroy()
     else:
-        create_message_box(original_message, "left", "aquamarine2", name)
+        if check_if_muted(name):
+            create_message_box("You cannot speak here.", "top", "gray82", "Server")
+        else:
+            create_message_box(original_message, "left", "aquamarine2", name)
 
 
 def receive_messages(text_widget):
@@ -114,6 +117,20 @@ def check_if_manager(user_name):
     return user_name
 
 
+def check_if_muted(user_name):
+    my_socket.send((str(len(user_name)).zfill(2) + user_name + "8").encode())
+    s_response = my_socket.recv(1024).decode()
+    muted_list = eval(s_response)
+    return user_name in muted_list
+
+
+def mute_or_unmute(button, user_name):
+    if check_if_muted(user_name):
+        button.configure(text="Unmute")
+    else:
+        button.configure(text="Mute")
+
+
 def kick_button(user_name, window):
     message = str(len(name)).zfill(2) + name + "3" + str(len(user_name)).zfill(4) + user_name
     my_socket.send(message.encode())
@@ -123,6 +140,12 @@ def kick_button(user_name, window):
 def promote_button(user_name, window):
     promote_message = str(len(name)).zfill(2) + name + "2" + str(len(user_name)).zfill(4) + user_name
     my_socket.send(promote_message.encode())
+    window.destroy()
+
+
+def mute_button(user_name, window):
+    message = str(len(name)).zfill(2) + name + "4" + str(len(user_name)).zfill(4) + user_name
+    my_socket.send(message.encode())
     window.destroy()
 
 
@@ -148,9 +171,15 @@ def name_button_options_window(user_name):
                             command=lambda: promote_button(user_name, button_options_window))
         button2.grid(row=1, column=0)
         check_if_have_access(button2, user_name)
+        button3 = tk.Button(button_options_window, text="Mute",
+                            command=lambda: mute_button(user_name, button_options_window))
+        button3.grid(row=0, column=1)
+        check_if_have_access(button3, user_name)
+        mute_or_unmute(button3, user_name)
         button_options_window.mainloop()
 
 
+name = ''
 while check_if_name_is_taken:
     name = input("What is your name? ")
     name_to_server = str(len(name)).zfill(2) + name + "0"
@@ -161,7 +190,6 @@ while check_if_name_is_taken:
     if server_response == 'OK':
         check_if_name_is_taken = False
         name_colour = random_colour(name)
-
 
 # Create the main GUI window
 root = tk.Tk()
