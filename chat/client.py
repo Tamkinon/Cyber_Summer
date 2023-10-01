@@ -38,7 +38,7 @@ def receive_messages(text_widget):
             data = my_socket.recv(int(message_length)).decode()
             if client_name == "Server":
                 splitted_message = data.split()
-                if splitted_message[-1] == name:
+                if splitted_message[-1] == name and splitted_message[-2] == "kicked":
                     root.destroy()
                 else:
                     create_message_box(data, "top", "gray82", client_name)
@@ -62,7 +62,9 @@ def create_message_box(message, side, colour, user_name):
     message_frame = tk.Frame(expanding_message_frame, bd=1, relief="solid", bg=colour)
     message_frame.pack(side=side, padx=(4.5, 8))
 
-    name_label_button = tk.Button(message_frame, relief="solid", bd=0, anchor="w", text=check_if_manager(user_name), font=("Arial", 14), justify="left", bg=colour, fg=random_colour(user_name), command=lambda: name_button_options_window(user_name))
+    name_label_button = tk.Button(message_frame, relief="solid", bd=0, anchor="w", text=check_if_manager(user_name),
+                                  font=("Arial", 14), justify="left", bg=colour, fg=random_colour(user_name),
+                                  command=lambda: name_button_options_window(user_name))
     name_label_button.pack(fill="x", anchor="w")
 
     message_label = tk.Label(message_frame, text=message, justify="left", bg=colour, font=fnt, wraplength=450)
@@ -118,6 +120,12 @@ def kick_button(user_name, window):
     window.destroy()
 
 
+def promote_button(user_name, window):
+    promote_message = str(len(name)).zfill(2) + name + "2" + str(len(user_name)).zfill(4) + user_name
+    my_socket.send(promote_message.encode())
+    window.destroy()
+
+
 def destroy_popup(event):
     global button_options_window
     button_options_window = None
@@ -132,9 +140,14 @@ def name_button_options_window(user_name):
         button_options_window.resizable(width=False, height=False)
         button_options_window.configure(bg="mintcream")
         button_options_window.geometry("200x200")
-        button1 = tk.Button(button_options_window, text="Kick", command=lambda: kick_button(user_name, button_options_window))
+        button1 = tk.Button(button_options_window, text="Kick",
+                            command=lambda: kick_button(user_name, button_options_window))
         button1.grid(row=0, column=0)
         check_if_have_access(button1, user_name)
+        button2 = tk.Button(button_options_window, text="Promote",
+                            command=lambda: promote_button(user_name, button_options_window))
+        button2.grid(row=1, column=0)
+        check_if_have_access(button2, user_name)
         button_options_window.mainloop()
 
 
@@ -144,7 +157,7 @@ while check_if_name_is_taken:
     my_socket.send(name_to_server.encode())
     server_response = my_socket.recv(1024).decode()
     if server_response == 'NO':
-        print("The name is already taken / has '@' in it / Your name cannot be 'Server'.")
+        print("The name is already taken / has spaces in it / has '@' in it / Your name cannot be 'Server'.")
     if server_response == 'OK':
         check_if_name_is_taken = False
         name_colour = random_colour(name)

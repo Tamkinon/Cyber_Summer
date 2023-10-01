@@ -12,11 +12,19 @@ def print_client_sockets(clients):
 
 
 def check_if_name_in_list(name):
-    if name not in name_list and name != 'Server' and name[0] != '@':
+    if name and name not in name_list and name != 'Server' and (not name.startswith('@') and " " not in name):
         name_list.append(name)
         current_socket.send("OK".encode())
     else:
         current_socket.send("NO".encode())
+
+
+def promote_to_manager(username):
+    if username not in managers_list:
+        managers_list.append(username)
+        server_message = data + " has been promoted to manager by " + client_name
+        msg = "6".zfill(2) + "Server" + str(len(server_message)).zfill(4) + server_message
+        messages_to_send.append((current_socket, client_sockets, msg))
 
 
 print("Setting up server...")
@@ -28,7 +36,7 @@ print("Listening for clients...")
 client_sockets = []
 messages_to_send = []
 # managers stuff
-managers_list = ['Ori', 'Tamir', 'Inbar']
+managers_list = ['Ori', 'Tamir']
 name_list = []
 
 
@@ -64,6 +72,10 @@ while True:
                 else:
                     message = name_length.zfill(2) + client_name + message_length.zfill(4) + data
                     messages_to_send.append((current_socket, client_sockets, message))
+            if client_command == '2':
+                message_length = current_socket.recv(4).decode()
+                data = current_socket.recv(int(message_length)).decode()
+                promote_to_manager(data)
             if client_command == '3':
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
@@ -72,20 +84,21 @@ while True:
                 kicked_client_socket = client_sockets[name_list.index(data)]
                 name_list.remove(data)
                 messages_to_send.append((kicked_client_socket, client_sockets, message))
-            if client_command == '6':
+            if client_command == '6': # sending the managers list
                 current_socket.send(str(managers_list).encode())
-            if client_command == '7':
+            if client_command == '7': # sending all-users list
                 current_socket.send(str(name_list).encode())
     for message in messages_to_send:
         for receiver_socket in client_sockets:
             sender_socket, client_sockets, data = message
             if sender_socket == kicked_client_socket and sender_socket in wlist:
                 kicked_client_socket.send(data.encode())
-            if sender_socket in wlist and receiver_socket is not sender_socket:
+            if sender_socket in wlist and (receiver_socket is not sender_socket or data[2:int(data[:2])+2] == "Server"):
                 print(data)
                 receiver_socket.send(data.encode())
         messages_to_send.remove(message)
     if kicked_client_socket in client_sockets:
+        print("danny dori")
         client_sockets.remove(kicked_client_socket)
         kicked_client_socket.close()
         print_client_sockets(client_sockets)
