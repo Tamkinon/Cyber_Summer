@@ -103,6 +103,13 @@ while True:
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
                 mute(data)
+            if client_command == '5':
+                addressee_length = current_socket.recv(2).decode()
+                addressee = current_socket.recv(int(addressee_length)).decode()
+                message_length = current_socket.recv(4).decode()
+                data = current_socket.recv(int(message_length)).decode()
+                message = name_length.zfill(2) + client_name + str(message_length).zfill(4) + data
+                messages_to_send.append((current_socket, [client_sockets[name_list.index(addressee)], ], message))
             if client_command == '6':  # sending the managers list
                 current_socket.send(str(managers_list).encode())
             if client_command == '7':  # sending all-users list
@@ -110,8 +117,8 @@ while True:
             if client_command == '8':  # sending the muted users list
                 current_socket.send(str(muted_list).encode())
     for message in messages_to_send:
+        sender_socket, client_sockets, data = message
         for receiver_socket in client_sockets:
-            sender_socket, client_sockets, data = message
             if sender_socket == kicked_client_socket and sender_socket in wlist:
                 kicked_client_socket.send(data.encode())
             if sender_socket in wlist and (receiver_socket is not sender_socket or data[2:int(data[:2])+2] == "Server"):

@@ -15,11 +15,17 @@ my_msg = []
 
 check_if_name_is_taken = True
 button_options_window = None
+is_next_message_private = False
+private_addressee = ''
 
 
 def send_message(msg_entry):
+    global is_next_message_private
     original_message = msg_entry.get("1.0", "end-1c")
     message = str(len(name)).zfill(2) + name + "1" + str(len(original_message.encode())).zfill(4) + original_message
+    if is_next_message_private:
+        message = str(len('!' + name)).zfill(2) + "!" + name + "5" + str(len(private_addressee)).zfill(2) + \
+                          private_addressee + str(len(original_message)).zfill(4) + original_message
     my_socket.send(message.encode())
     msg_entry.delete(1.0, tk.END)
     if original_message.lower() == "quit":
@@ -28,7 +34,11 @@ def send_message(msg_entry):
         if check_if_muted(name):
             create_message_box("You cannot speak here.", "top", "gray82", "Server")
         else:
-            create_message_box(original_message, "left", "aquamarine2", name)
+            if is_next_message_private:
+                create_message_box(original_message, "left", "plum", '!' + name)
+                is_next_message_private = False
+            else:
+                create_message_box(original_message, "left", "aquamarine2", name)
 
 
 def receive_messages(text_widget):
@@ -46,7 +56,10 @@ def receive_messages(text_widget):
                 else:
                     create_message_box(data, "top", "gray82", client_name)
             else:
-                create_message_box(data, "right", "LightCyan3", client_name)
+                if client_name.startswith('!'):
+                    create_message_box(data, "right", "plum", client_name)
+                else:
+                    create_message_box(data, "right", "LightCyan3", client_name)
 
 
 def create_message_box(message, side, colour, user_name):
@@ -149,6 +162,14 @@ def mute_button(user_name, window):
     window.destroy()
 
 
+def private_message_button(user_name, window):
+    global is_next_message_private, private_addressee
+    is_next_message_private = True
+    private_addressee = user_name
+    create_message_box("You are now sending a private message to " + user_name, "top", "gray82", "Server")
+    window.destroy()
+
+
 def destroy_popup(event):
     global button_options_window
     button_options_window = None
@@ -176,6 +197,9 @@ def name_button_options_window(user_name):
         button3.grid(row=0, column=1)
         check_if_have_access(button3, user_name)
         mute_or_unmute(button3, user_name)
+        button4 = tk.Button(button_options_window, text="Whisper",
+                            command=lambda: private_message_button(user_name, button_options_window))
+        button4.grid(row=1, column=1)
         button_options_window.mainloop()
 
 
@@ -186,7 +210,7 @@ while check_if_name_is_taken:
     my_socket.send(name_to_server.encode())
     server_response = my_socket.recv(1024).decode()
     if server_response == 'NO':
-        print("The name is already taken / has spaces in it / has '@' in it / Your name cannot be 'Server'.")
+        print("The name is already taken / has spaces in it / starts with '@' or '!' / Your name cannot be 'Server'.")
     if server_response == 'OK':
         check_if_name_is_taken = False
         name_colour = random_colour(name)
