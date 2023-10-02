@@ -115,7 +115,20 @@ def check_if_have_access(button, user_name):
     my_socket.send((str(len(name)).zfill(2) + name + "7").encode())
     s_response = my_socket.recv(1024).decode()
     name_list = eval(s_response)
-    if name not in manager_list or name == user_name or user_name not in name_list:
+    if name not in manager_list or name == user_name or user_name not in name_list or user_name == "Server":
+        button.configure(state=tk.DISABLED)
+    else:
+        if button.cget("text") == "Promote" and user_name in manager_list:
+            button.configure(state=tk.DISABLED)
+        else:
+            button.configure(state=tk.ACTIVE)
+
+
+def can_whisper(button, user_name):
+    my_socket.send((str(len(name)).zfill(2) + name + "7").encode())
+    s_response = my_socket.recv(1024).decode()
+    name_list = eval(s_response)
+    if name == user_name or user_name not in name_list or user_name == "Server":
         button.configure(state=tk.DISABLED)
     else:
         button.configure(state=tk.ACTIVE)
@@ -125,8 +138,12 @@ def check_if_manager(user_name):
     my_socket.send((str(len(user_name)).zfill(2) + user_name + "6").encode())
     s_response = my_socket.recv(1024).decode()
     manager_list = eval(s_response)
-    if user_name in manager_list:
-        user_name = '@' + user_name
+    if user_name.startswith("!"):
+        if user_name[1:] in manager_list:
+            user_name = "!@" + user_name[1:]
+    else:
+        if user_name in manager_list:
+            user_name = "@" + user_name
     return user_name
 
 
@@ -178,6 +195,8 @@ def destroy_popup(event):
 def name_button_options_window(user_name):
     global button_options_window
     if not button_options_window:
+        if user_name.startswith("!"):
+            user_name = user_name[1:]
         button_options_window = tk.Toplevel()
         button_options_window.bind("<Destroy>", destroy_popup)
         button_options_window.title("Options Window")
@@ -200,6 +219,7 @@ def name_button_options_window(user_name):
         button4 = tk.Button(button_options_window, text="Whisper",
                             command=lambda: private_message_button(user_name, button_options_window))
         button4.grid(row=1, column=1)
+        can_whisper(button4, user_name)
         button_options_window.mainloop()
 
 

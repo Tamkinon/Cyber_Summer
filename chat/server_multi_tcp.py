@@ -71,7 +71,7 @@ while True:
             client_command = current_socket.recv(1).decode()
             if client_command == '0':
                 check_if_name_in_list(client_name)
-            if client_command == '1':
+            elif client_command == '1':
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
                 if data == "quit":
@@ -87,11 +87,11 @@ while True:
                     if client_name not in muted_list:
                         message = name_length.zfill(2) + client_name + message_length.zfill(4) + data
                         messages_to_send.append((current_socket, client_sockets, message))
-            if client_command == '2':
+            elif client_command == '2':
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
                 promote_to_manager(data)
-            if client_command == '3':
+            elif client_command == '3':
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
                 message = client_name + " kicked " + data
@@ -99,26 +99,38 @@ while True:
                 kicked_client_socket = client_sockets[name_list.index(data)]
                 name_list.remove(data)
                 messages_to_send.append((kicked_client_socket, client_sockets, message))
-            if client_command == '4':
+            elif client_command == '4':
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
                 mute(data)
-            if client_command == '5':
+            elif client_command == '5':
                 addressee_length = current_socket.recv(2).decode()
                 addressee = current_socket.recv(int(addressee_length)).decode()
                 message_length = current_socket.recv(4).decode()
                 data = current_socket.recv(int(message_length)).decode()
-                message = name_length.zfill(2) + client_name + str(message_length).zfill(4) + data
-                messages_to_send.append((current_socket, [client_sockets[name_list.index(addressee)], ], message))
-            if client_command == '6':  # sending the managers list
+                if data == "quit":
+                    print("Connection closed", current_socket.getpeername())
+                    data = client_name[1:] + " has left the chat!"
+                    message = "6".zfill(2) + "Server" + str(len(data)).zfill(4) + data
+                    messages_to_send.append((current_socket, client_sockets, message))
+                    client_sockets.remove(current_socket)
+                    name_list.remove(client_name[1:])
+                    current_socket.close()
+                    print_client_sockets(client_sockets)
+                else:
+                    if client_name[1:] not in muted_list:
+                        message = name_length.zfill(2) + client_name + str(message_length).zfill(4) + data
+                        private_socket_index = name_list.index(addressee)
+                        messages_to_send.append((current_socket, [client_sockets[name_list.index(addressee)], ], message))
+            elif client_command == '6':  # sending the managers list
                 current_socket.send(str(managers_list).encode())
-            if client_command == '7':  # sending all-users list
+            elif client_command == '7':  # sending all-users list
                 current_socket.send(str(name_list).encode())
-            if client_command == '8':  # sending the muted users list
+            elif client_command == '8':  # sending the muted users list
                 current_socket.send(str(muted_list).encode())
     for message in messages_to_send:
-        sender_socket, client_sockets, data = message
-        for receiver_socket in client_sockets:
+        sender_socket, receiver_sockets, data = message
+        for receiver_socket in receiver_sockets:
             if sender_socket == kicked_client_socket and sender_socket in wlist:
                 kicked_client_socket.send(data.encode())
             if sender_socket in wlist and (receiver_socket is not sender_socket or data[2:int(data[:2])+2] == "Server"):
