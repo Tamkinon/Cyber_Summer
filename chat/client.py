@@ -21,7 +21,7 @@ private_addressee = ''
 
 def send_message(msg_entry):
     global is_next_message_private
-    original_message = msg_entry.get("1.0", "end-1c")
+    original_message = msg_entry.get("1.0", "end-1c").strip()
     message = str(len(name)).zfill(2) + name + "1" + str(len(original_message.encode())).zfill(4) + original_message
     if is_next_message_private:
         message = str(len('!' + name)).zfill(2) + "!" + name + "5" + str(len(private_addressee)).zfill(2) + \
