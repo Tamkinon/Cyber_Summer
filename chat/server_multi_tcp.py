@@ -84,7 +84,7 @@ while True:
                     current_socket.close()
                     print_client_sockets(client_sockets)
                 else:
-                    if client_name not in muted_list:
+                    if client_name not in muted_list and data != "view-managers":
                         message = name_length.zfill(2) + client_name + message_length.zfill(4) + data
                         messages_to_send.append((current_socket, client_sockets, message))
             elif client_command == '2':

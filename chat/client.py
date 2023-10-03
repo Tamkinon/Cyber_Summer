@@ -25,7 +25,7 @@ def send_message(msg_entry):
     message = str(len(name)).zfill(2) + name + "1" + str(len(original_message.encode())).zfill(4) + original_message
     if is_next_message_private:
         message = str(len('!' + name)).zfill(2) + "!" + name + "5" + str(len(private_addressee)).zfill(2) + \
-                          private_addressee + str(len(original_message)).zfill(4) + original_message
+                          private_addressee + str(len(original_message.encode())).zfill(4) + original_message
     my_socket.send(message.encode())
     msg_entry.delete(1.0, tk.END)
     if original_message.lower() == "quit":
@@ -33,6 +33,11 @@ def send_message(msg_entry):
     else:
         if check_if_muted(name):
             create_message_box("You cannot speak here.", "top", "gray82", "Server")
+        elif original_message == "view-managers":
+            my_socket.send((str(len(name)).zfill(2) + name + "6").encode())
+            s_response = my_socket.recv(1024).decode()
+            manager_list = eval(s_response)
+            create_message_box("The current managers are: " + ", ".join(manager_list), "top", "gray82", "Server")
         else:
             if is_next_message_private:
                 create_message_box(original_message, "left", "plum", '!' + name)
@@ -93,7 +98,6 @@ def create_message_box(message, side, colour, user_name):
 def on_canvas_configure(event):
     canvas.itemconfig("frame", width=canvas.winfo_width())  # Make the frame fill the canvas width
     canvas.config(scrollregion=canvas.bbox("all"))
-    # canvas.yview_moveto(1.0)
 
 
 def random_colour(c_name):
