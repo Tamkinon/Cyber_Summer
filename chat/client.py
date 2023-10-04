@@ -5,6 +5,7 @@ import select
 from tkextrafont import Font
 import random
 import datetime
+from PIL import Image, ImageTk
 
 my_socket = socket.socket()
 my_socket.connect(("127.0.0.1", 5555))
@@ -18,6 +19,14 @@ button_options_window = None
 is_next_message_private = False
 private_addressee = ''
 
+# Colours
+button_bg = "#e3e7e8"
+fg = "black"
+bg = "#f5f9fa"
+
+pad_y = 10
+pad_x = 10
+
 
 def send_message(msg_entry):
     global is_next_message_private
@@ -26,24 +35,25 @@ def send_message(msg_entry):
     if is_next_message_private:
         message = str(len('!' + name)).zfill(2) + "!" + name + "5" + str(len(private_addressee)).zfill(2) + \
                           private_addressee + str(len(original_message.encode())).zfill(4) + original_message
-    my_socket.send(message.encode())
-    msg_entry.delete(1.0, tk.END)
-    if original_message.lower() == "quit":
-        root.destroy()
-    else:
-        if check_if_muted(name):
-            create_message_box("You cannot speak here.", "top", "gray82", "Server")
-        elif original_message == "view-managers":
-            my_socket.send((str(len(name)).zfill(2) + name + "6").encode())
-            s_response = my_socket.recv(1024).decode()
-            manager_list = eval(s_response)
-            create_message_box("The current managers are: " + ", ".join(manager_list), "top", "gray82", "Server")
+    if original_message != "":
+        my_socket.send(message.encode())
+        msg_entry.delete(1.0, tk.END)
+        if original_message.lower() == "quit":
+            root.destroy()
         else:
-            if is_next_message_private:
-                create_message_box(original_message, "left", "plum", '!' + name)
-                is_next_message_private = False
+            if check_if_muted(name):
+                create_message_box("You cannot speak here.", "top", "gray82", "Server")
+            elif original_message == "view-managers":
+                my_socket.send((str(len(name)).zfill(2) + name + "6").encode())
+                s_response = my_socket.recv(1024).decode()
+                manager_list = eval(s_response)
+                create_message_box("The current managers are: " + ", ".join(manager_list), "top", "gray82", "Server")
             else:
-                create_message_box(original_message, "left", "aquamarine2", name)
+                if is_next_message_private:
+                    create_message_box(original_message, "left", "#e792fc", '!' + name)
+                    is_next_message_private = False
+                else:
+                    create_message_box(original_message, "left", "#b4fabb", name)
 
 
 def receive_messages(text_widget):
@@ -62,22 +72,21 @@ def receive_messages(text_widget):
                     create_message_box(data, "top", "gray82", client_name)
             else:
                 if client_name.startswith('!'):
-                    create_message_box(data, "right", "plum", client_name)
+                    create_message_box(data, "right", "#e792fc", client_name)
                 else:
-                    create_message_box(data, "right", "LightCyan3", client_name)
+                    create_message_box(data, "right", "#e0e0e0", client_name)
 
 
 def create_message_box(message, side, colour, user_name):
-    # bd (border width) - specifies the width of the border around the frame
-    # relief - specifies the type of border or relief effect around the frame.
-    # In this case, "solid" is used to create a solid border around the frame.
-    # padx and pady -
-    # specify the amount of empty space or padding to add around the content inside the frame.
-    # wraplength specifies the maximum number of pixels that can appear on a single line before the text is automatically wrapped to the next line.
-    # justify specifies how the text should be aligned within its container.
-    # "left" means the text is left-aligned within the Label widget, so it starts from the left edge and extends to the right as far as necessary.
+    # bd (border width) - specifies the width of the border around the frame relief - specifies the type of border or
+    # relief effect around the frame. In this case, "solid" is used to create a solid border around the frame. padx
+    # and pady - specify the amount of empty space or padding to add around the content inside the frame. wraplength
+    # specifies the maximum number of pixels that can appear on a single line before the text is automatically
+    # wrapped to the next line. justify specifies how the text should be aligned within its container. "left" means
+    # the text is left-aligned within the Label widget, so it starts from the left edge and extends to the right as
+    # far as necessary.
 
-    expanding_message_frame = tk.Frame(chat_frame, relief="sunken", pady=5, bg="#e1fcf7")
+    expanding_message_frame = tk.Frame(chat_frame, relief="sunken", pady=5, bg="#e7e6e8")
     expanding_message_frame.pack(side="top", fill="x")
 
     message_frame = tk.Frame(expanding_message_frame, bd=1, relief="solid", bg=colour)
@@ -205,25 +214,34 @@ def name_button_options_window(user_name):
         button_options_window.bind("<Destroy>", destroy_popup)
         button_options_window.title("Options Window")
         button_options_window.resizable(width=False, height=False)
-        button_options_window.configure(bg="mintcream")
-        button_options_window.geometry("200x200")
-        button1 = tk.Button(button_options_window, text="Kick",
+        button_options_window.configure(bg=bg)
+        button_options_window.geometry("300x135")
+
+        button1 = tk.Button(button_options_window, button_settings, text="Kick",
                             command=lambda: kick_button(user_name, button_options_window))
-        button1.grid(row=0, column=0)
+        button1.grid(row=0, column=0, padx=pad_x, pady=pad_y)
+
         check_if_have_access(button1, user_name)
-        button2 = tk.Button(button_options_window, text="Promote",
+
+        button2 = tk.Button(button_options_window, button_settings, text="Promote",
                             command=lambda: promote_button(user_name, button_options_window))
-        button2.grid(row=1, column=0)
+        button2.grid(row=1, column=0, padx=pad_x, pady=pad_y)
+
         check_if_have_access(button2, user_name)
-        button3 = tk.Button(button_options_window, text="Mute",
+
+        button3 = tk.Button(button_options_window, button_settings, text="Mute",
                             command=lambda: mute_button(user_name, button_options_window))
-        button3.grid(row=0, column=1)
+        button3.grid(row=0, column=1, padx=pad_x, pady=pad_y)
+
         check_if_have_access(button3, user_name)
         mute_or_unmute(button3, user_name)
-        button4 = tk.Button(button_options_window, text="Whisper",
+
+        button4 = tk.Button(button_options_window, button_settings, text="Whisper",
                             command=lambda: private_message_button(user_name, button_options_window))
-        button4.grid(row=1, column=1)
+        button4.grid(row=1, column=1, padx=pad_x, pady=pad_y)
+
         can_whisper(button4, user_name)
+
         button_options_window.mainloop()
 
 
@@ -243,16 +261,19 @@ while check_if_name_is_taken:
 root = tk.Tk()
 root.resizable(width=False, height=False)
 root.title(name + "'s Chat")
-root.configure(bg="lightblue")
+root.configure(bg="#e7e6e8")
 root.geometry("600x800")
 
 # Font for all text
 fnt = Font(file="VarelaRound-Regular.ttf", family="Varela round", size=15)
 
+button_settings = {"height": 1, "width": 10, "font": fnt, "fg": fg,
+                   "bg": button_bg, "relief": "solid", "border": 1}
+
 # Create a Canvas
-container = tk.Frame(root, background="#e1fcf7")
+container = tk.Frame(root, background="#e7e6e8")
 container.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-canvas = tk.Canvas(container, background="#e1fcf7")
+canvas = tk.Canvas(container, background="#e7e6e8")
 canvas.pack(side="left", fill="both", expand=True)
 
 # Create a scroll bar
@@ -263,7 +284,7 @@ scrollbar.pack(side="right", fill="y")
 canvas.configure(yscrollcommand=scrollbar.set)
 
 # Frame for displaying messages
-chat_frame = tk.Frame(canvas, background="#e1fcf7")
+chat_frame = tk.Frame(canvas, background=bg)
 canvas.create_window((0, 0), window=chat_frame, anchor="nw", tags="frame")
 chat_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
@@ -276,8 +297,11 @@ message_entry = scrolledtext.ScrolledText(input_frame, height=2, width=5, font=f
 message_entry.pack(side='left', fill='x', expand=True)
 
 # Create a send button.
-imgSend = tk.PhotoImage(file='send.png')
-send_button = tk.Button(input_frame, text="Send", image=imgSend, command=lambda: send_message(message_entry))
+imgSend = Image.open('send.png')
+resized_image = imgSend.resize((60, 60), Image.LANCZOS)
+new_image = ImageTk.PhotoImage(resized_image)
+send_button = tk.Button(input_frame, image=new_image, relief="solid",
+                        border=0, command=lambda: send_message(message_entry))
 send_button.pack(side='right')
 
 # configure the canvas
