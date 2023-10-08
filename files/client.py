@@ -18,7 +18,7 @@ window = tk.Tk()
 
 DL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-# Paths (Server - Desktop)
+# Paths (Server)
 server_path = "C:\\Server Files"
 
 # Fonts
