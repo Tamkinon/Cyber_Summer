@@ -86,6 +86,7 @@ def create_root(name):
     w = root.winfo_screenwidth()
     h = root.winfo_screenheight()
     root.geometry("%dx%d+%d+%d" % (int(w), int(h), 0, 0))
+    root.resizable(width=False, height=False)
     return root
 
 
@@ -223,11 +224,12 @@ def main():
     h = menu.winfo_screenheight()
     menu.geometry("%dx%d+%d+%d" % (int(w / 2), int(h / 2), int(w / 4), int(h / 5)))
     menu.configure(bg="light blue")
+    menu.resizable(width=False, height=False)
 
-    button1 = Button(menu, text="first picture", bg="orange", command=lambda: picture1(menu))
-    button2 = Button(menu, text="second picture", bg="dark orange", command=lambda: picture2(menu))
-    button3 = Button(menu, text="third picture", bg="coral", command=lambda: picture3(menu))
-    title = Label(menu, text="color game", bg="light blue", font="Times 60 italic bold")
+    button1 = Button(menu, text="First picture", bg="orange", command=lambda: picture1(menu), width=15)
+    button2 = Button(menu, text="Second picture", bg="dark orange", command=lambda: picture2(menu), width=15)
+    button3 = Button(menu, text="Third picture", bg="coral", command=lambda: picture3(menu), width=15)
+    title = Label(menu, text="Color Game", bg="light blue", font="Times 60 italic bold")
 
     title.pack(expand=True)
     button1.pack(expand=True, anchor="n", ipadx=40, ipady=20)

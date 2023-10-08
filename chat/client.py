@@ -74,7 +74,7 @@ def receive_messages(text_widget):
                 if client_name.startswith('!'):
                     create_message_box(data, "right", "#e792fc", client_name)
                 else:
-                    create_message_box(data, "right", "#e0e0e0", client_name)
+                    create_message_box(data, "right", "#f5f5f5", client_name)
 
 
 def create_message_box(message, side, colour, user_name):
