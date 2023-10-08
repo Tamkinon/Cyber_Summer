@@ -24,8 +24,8 @@ button_bg = "#e3e7e8"
 fg = "black"
 bg = "#f5f9fa"
 
-pad_y = 10
 pad_x = 10
+pad_y = 10
 
 
 def send_message(msg_entry):

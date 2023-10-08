@@ -187,7 +187,7 @@ def create_buttons(root1, buttons):
 
 def picture1(menu):
     menu.destroy()
-    root = create_root("picture 1")
+    root = create_root("Picture 1")
 
     buttons = print_picture(picture_matrix1, root)
 
@@ -198,7 +198,7 @@ def picture1(menu):
 
 def picture2(menu):
     menu.destroy()
-    root = create_root("picture 2")
+    root = create_root("Picture 2")
 
     buttons = print_picture(picture_matrix2, root)
 
@@ -209,7 +209,7 @@ def picture2(menu):
 
 def picture3(menu):
     menu.destroy()
-    root = create_root("picture 3")
+    root = create_root("Picture 3")
 
     buttons = print_picture(picture_matrix3, root)
 
