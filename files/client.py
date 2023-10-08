@@ -19,8 +19,7 @@ window = tk.Tk()
 DL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 # Paths (Server - Desktop)
-desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-server_path = desktop_path + "\\" + "Server Files"
+server_path = "C:\\Server Files"
 
 # Fonts
 fnt = Font(file="VarelaRound-Regular.ttf", family="Varela round", size=10)
@@ -199,16 +198,16 @@ def main():
 
     # Buttons
     download_button = tk.Button(frame, button_settings, text=button_texts[0],
-                                command=lambda: open_dialog(server_path, desktop_path, 0, 4))
+                                command=lambda: open_dialog(server_path, "C:\\", 0, 4))
 
     upload_button = tk.Button(frame, button_settings, text=button_texts[1],
-                              command=lambda: open_dialog(desktop_path, server_path, 2, 5))
+                              command=lambda: open_dialog("C:\\", server_path, 2, 5))
 
     download_usb_button = tk.Button(frame, button_settings, text=button_texts[2],
-                                    command=lambda: open_dialog(check_for_usb_type()[1], desktop_path, 1, 4))
+                                    command=lambda: open_dialog(check_for_usb_type()[1], "C:\\", 1, 4))
 
     upload_usb_button = tk.Button(frame, button_settings, text=button_texts[3],
-                                  command=lambda: open_dialog(desktop_path, check_for_usb_type()[1], 3, 5))
+                                  command=lambda: open_dialog("C:\\", check_for_usb_type()[1], 3, 5))
 
     save_button = tk.Button(window, height=1, width=10, text="Save", font=fnt, fg="black", bg=button_bg,
                             relief="solid", border=1, command=lambda: send_file_to_server(var1.get(), var2.get()))
